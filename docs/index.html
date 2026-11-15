@@ -4,126 +4,98 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>웹 타임머신 — 웹사이트를 과거로 되돌리는 크롬 확장</title>
+<meta name="description" content="지금 보고 있는 웹사이트를 Wayback Machine 아카이브의 옛날 모습으로 되돌리는 크롬 확장. 연도만 고르면 1999년, 2005년 그 시절로.">
 <style>
+  @font-face { font-family: 'Galmuri11'; src: url('fonts/galmuri11.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Galmuri11'; src: url('fonts/galmuri11-bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+  :root {
+    --bg: #f4f3ef; --surface: #fff; --ink: #1b1a17; --muted: #75736c;
+    --line: #e4e2da; --accent: #0d9488; --accent-ink: #0f766e; --accent-soft: #d7f0ec;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    --font-pixel: 'Galmuri11', monospace;
+  }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Tahoma, "MS Sans Serif", Gulim, sans-serif;
-    font-size: 14px;
-    background: #008080;
-    color: #000;
-    line-height: 1.6;
-  }
-  .desktop { max-width: 860px; margin: 32px auto; padding: 0 16px; }
-  .window {
-    background: #c0c0c0;
-    border: 2px outset #dfdfdf;
-    margin-bottom: 24px;
-  }
-  .title-bar {
-    background: linear-gradient(90deg, #000080, #1084d0);
-    color: #fff;
-    font-weight: bold;
-    padding: 4px 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    user-select: none;
-  }
-  .title-bar .title { flex: 1; }
-  .tb {
-    width: 18px; height: 16px;
-    background: #c0c0c0; border: 2px outset #dfdfdf;
-    font-size: 9px; font-weight: bold; color: #000;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .body { padding: 20px; }
-  h1 { margin: 0 0 8px; font-size: 28px; }
-  h2 { margin: 0 0 12px; font-size: 18px; }
-  .hero { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-  .hero img { width: 96px; height: 96px; image-rendering: pixelated; border: 2px inset #dfdfdf; background: #c0c0c0; }
-  .tagline { font-size: 16px; margin: 0; }
+  body { margin: 0; font-family: var(--font-body); background: var(--bg); color: var(--ink); line-height: 1.65; }
+  .pixel { font-family: var(--font-pixel); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 20px 64px; }
+  .hero { text-align: center; margin-bottom: 40px; }
+  .hero img { width: 88px; height: 88px; image-rendering: pixelated; border-radius: 20px; box-shadow: 0 8px 24px rgba(27,26,23,.12); }
+  h1 { font-family: var(--font-pixel); font-size: 34px; letter-spacing: 2px; margin: 18px 0 6px; }
+  .tagline { font-size: 16px; color: var(--muted); margin: 0 0 22px; }
+  .tagline b { color: var(--ink); }
   .btn {
-    display: inline-block;
-    background: #c0c0c0; border: 2px outset #dfdfdf;
-    padding: 8px 20px; font: inherit; font-weight: bold; color: #000;
-    text-decoration: none; cursor: pointer; margin: 4px 4px 0 0;
+    display: inline-block; border: 1px solid var(--line); background: var(--surface);
+    border-radius: 10px; padding: 11px 22px; font: inherit; font-weight: 600;
+    color: var(--ink); text-decoration: none; cursor: pointer; margin: 0 4px;
+    transition: all .12s;
   }
-  .btn:active { border-style: inset; }
-  .shot { width: 100%; border: 2px inset #dfdfdf; display: block; }
-  .caption { color: #404040; margin: 8px 0 0; font-size: 12px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-  .card { border: 2px inset #dfdfdf; background: #fff; padding: 12px; }
-  .card b { display: block; margin-bottom: 6px; }
-  .card p { margin: 0; font-size: 13px; }
+  .btn:hover { border-color: #cfcdc4; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-ink); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(27,26,23,.05), 0 8px 24px rgba(27,26,23,.07);
+    padding: 24px; margin-bottom: 24px;
+  }
+  .card h2 { font-family: var(--font-pixel); font-size: 17px; letter-spacing: 1px; margin: 0 0 14px; }
+  .shot { width: 100%; border: 1px solid var(--line); border-radius: 10px; display: block; }
+  .caption { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .feature { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--bg); }
+  .feature b { display: block; margin-bottom: 6px; }
+  .feature b .pixel { color: var(--accent-ink); margin-right: 6px; }
+  .feature p { margin: 0; font-size: 13px; color: var(--muted); }
   ol { margin: 0; padding-left: 22px; }
   ol li { margin-bottom: 8px; }
-  code {
-    background: #fff; border: 1px solid #808080;
-    padding: 1px 5px; font-family: "Courier New", monospace; font-size: 13px;
-  }
-  .status-bar {
-    border-top: 1px solid #808080; box-shadow: 0 1px 0 #dfdfdf;
-    padding: 4px 8px; font-size: 12px; color: #404040;
-    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px;
-  }
-  a { color: #0000ee; }
-  a:visited { color: #551a8b; }
+  code { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-family: 'Courier New', monospace; font-size: 13px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
+  footer a { color: var(--accent-ink); }
+  .strip { height: 4px; background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent 8px 16px); opacity: .3; border-radius: 2px; margin: 0 0 24px; }
 </style>
 </head>
 <body>
-<div class="desktop">
+<div class="wrap">
 
-  <div class="window">
-    <div class="title-bar"><span class="title">웹 타임머신 — Web Time Machine</span><span class="tb">_</span><span class="tb">□</span><span class="tb">X</span></div>
-    <div class="body">
-      <div class="hero">
-        <img src="icon128.png" alt="웹 타임머신 아이콘">
-        <div>
-          <h1>웹 타임머신</h1>
-          <p class="tagline">지금 보고 있는 웹사이트를 1999년, 2005년… 그 시절 모습으로 되돌립니다.<br>Wayback Machine 아카이브 + 윈도우95 레트로 스킨.</p>
-          <p>
-            <a class="btn" href="https://github.com/purplemacaron/web-time-machine/releases/latest">최신 버전 다운로드</a>
-            <a class="btn" href="https://github.com/purplemacaron/web-time-machine">GitHub 저장소</a>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="status-bar"><span>상태: 배포 완료</span><span>Manifest V3 · 무료 · 오픈소스</span></div>
+  <div class="hero">
+    <img src="icon128.png" alt="웹 타임머신 아이콘">
+    <h1>웹 타임머신</h1>
+    <p class="tagline">지금 보고 있는 웹사이트를 <b>1999년, 2005년… 그 시절 모습</b>으로 되돌립니다.<br>Wayback Machine 아카이브 기반 크롬 확장.</p>
+    <a class="btn primary" href="https://github.com/purplemacaron/web-time-machine/releases/latest">최신 버전 다운로드</a>
+    <a class="btn" href="https://github.com/purplemacaron/web-time-machine">GitHub 저장소</a>
   </div>
 
-  <div class="window">
-    <div class="title-bar"><span class="title">미리 보기 — naver.com, 2001년</span><span class="tb">X</span></div>
-    <div class="body">
-      <img class="shot" src="screenshot.png" alt="2001년 네이버 모습을 보여주는 웹 타임머신 뷰어">
-      <p class="caption">실제 확장 프로그램 화면. 연도만 바꾸면 같은 사이트의 다른 시대로 이동합니다.</p>
-    </div>
+  <div class="strip"></div>
+
+  <div class="card">
+    <h2>미리 보기 — naver.com, 2001</h2>
+    <img class="shot" src="screenshot.png" alt="2001년 네이버 모습을 보여주는 웹 타임머신 뷰어">
+    <p class="caption">실제 확장 프로그램 화면. 연도만 바꾸면 같은 사이트의 다른 시대로 이동합니다.</p>
   </div>
 
-  <div class="window">
-    <div class="title-bar"><span class="title">기능</span><span class="tb">X</span></div>
-    <div class="body">
-      <div class="cards">
-        <div class="card"><b>연도 선택 시간 이동</b><p>팝업에서 연도(1996~현재)를 고르면 Wayback Machine이 그 시점의 가장 가까운 스냅샷을 찾아 보여줍니다.</p></div>
-        <div class="card"><b>레트로 스킨</b><p>아카이브 페이지에 윈도우95풍 스크롤바·버튼·입력창 스킨을 입힙니다. 켜고 끄기 자유.</p></div>
-        <div class="card"><b>현재로 복귀</b><p>버튼 한 번이면 원래의 현재 페이지로 돌아갑니다. 주소창에는 원래 사이트 주소가 표시됩니다.</p></div>
-      </div>
+  <div class="card">
+    <h2>기능</h2>
+    <div class="cards">
+      <div class="feature"><b><span class="pixel">01</span>연도 선택 시간 이동</b><p>팝업에서 연도(1996~현재)를 고르면 Wayback Machine이 그 시점의 가장 가까운 스냅샷을 찾아 보여줍니다.</p></div>
+      <div class="feature"><b><span class="pixel">02</span>레트로 스킨</b><p>아카이브 페이지에 윈도우95풍 스크롤바·버튼·입력창 스킨을 입힙니다. 켜고 끄기 자유.</p></div>
+      <div class="feature"><b><span class="pixel">03</span>현재로 복귀</b><p>버튼 한 번이면 원래의 현재 페이지로 돌아갑니다. 주소창에는 원래 사이트 주소가 표시됩니다.</p></div>
     </div>
   </div>
 
-  <div class="window">
-    <div class="title-bar"><span class="title">설치 방법</span><span class="tb">X</span></div>
-    <div class="body">
-      <ol>
-        <li>최신 버전 ZIP을 다운로드해 압축을 풉니다. (또는 <code>git clone</code>)</li>
-        <li>크롬 주소창에 <code>chrome://extensions</code> 입력 후 이동합니다.</li>
-        <li>오른쪽 위 <b>개발자 모드</b>를 켭니다.</li>
-        <li><b>압축해제된 확장 프로그램을 로드합니다</b>를 눌러 폴더를 선택합니다.</li>
-        <li>아무 웹사이트나 방문한 뒤 툴바의 모래시계 아이콘을 클릭, 연도를 고르고 <b>과거로 이동</b>.</li>
-      </ol>
-    </div>
-    <div class="status-bar"><span>아카이브 출처: Wayback Machine (archive.org)</span><span>스냅샷이 없는 연도는 가장 가까운 연도로 안내합니다</span></div>
+  <div class="card">
+    <h2>설치 방법</h2>
+    <ol>
+      <li>최신 버전 ZIP을 다운로드해 압축을 풉니다. (또는 <code>git clone</code>)</li>
+      <li>크롬 주소창에 <code>chrome://extensions</code> 입력 후 이동합니다.</li>
+      <li>오른쪽 위 <b>개발자 모드</b>를 켭니다.</li>
+      <li><b>압축해제된 확장 프로그램을 로드합니다</b>를 눌러 폴더를 선택합니다.</li>
+      <li>아무 웹사이트나 방문한 뒤 툴바의 모래시계 아이콘을 클릭, 연도를 고르고 <b>과거로 이동</b>.</li>
+    </ol>
   </div>
+
+  <footer>
+    아카이브 출처: Wayback Machine (archive.org) · 스냅샷이 없는 연도는 가장 가까운 연도로 안내합니다<br>
+    <a href="privacy.html">개인정보처리방침</a> · <a href="https://github.com/purplemacaron/web-time-machine/issues">문의</a>
+  </footer>
 
 </div>
 </body>

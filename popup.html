@@ -4,40 +4,66 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="ui.css">
 <style>
-  body { width: 300px; }
-  .window { border: 2px outset #dfdfdf; }
-  .body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-  .site { margin: 0; }
-  .year-row { display: flex; align-items: center; gap: 8px; }
-  .year-row b { font-size: 16px; min-width: 44px; text-align: center; }
-  input[type="range"] { flex: 1; }
-  .presets { display: flex; gap: 4px; }
-  .presets .btn { flex: 1; padding: 3px 0; }
-  .check { display: flex; align-items: center; gap: 6px; }
-  .msg { margin: 0; color: #808080; min-height: 14px; }
+  body { width: 320px; background: var(--surface); }
+  .popup { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .pop-head { display: flex; align-items: center; gap: 10px; }
+  .logo { width: 34px; height: 34px; image-rendering: pixelated; border-radius: 8px; }
+  .brand-name { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+  .brand-sub { font-size: 9px; letter-spacing: 2.5px; color: var(--muted); margin-top: 2px; }
+  .year-block { text-align: center; padding: 4px 0 2px; }
+  .year-label { font-size: 11px; color: var(--muted); }
+  .year-display { font-size: 34px; font-weight: 700; letter-spacing: 3px; margin: 2px 0 6px; }
+  .slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+  .presets { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+  .skin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    cursor: pointer;
+  }
+  .skin-row .hint { display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+  .cta { width: 100%; padding: 10px; font-size: 14px; border-radius: 10px; }
+  .msg { margin: 0; color: #b91c1c; font-size: 11px; min-height: 14px; text-align: center; }
+  .pop-foot { text-align: center; font-size: 10px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
 </style>
 </head>
 <body>
-<div class="window">
-  <div class="title-bar"><span class="title">시간 이동 — 웹 타임머신</span></div>
-  <div class="body">
-    <p class="site">현재 사이트: <b id="host">확인 중…</b></p>
-    <div class="year-row">
-      <span>연도</span>
-      <input type="range" id="year" min="1996" value="2001">
-      <b id="yearLabel">2001</b>
+<div class="popup">
+  <header class="pop-head">
+    <img src="icons/icon48.png" class="logo" alt="">
+    <div>
+      <div class="pixel brand-name">웹 타임머신</div>
+      <div class="brand-sub">WEB TIME MACHINE</div>
     </div>
+  </header>
+
+  <div class="site-chip"><span class="dot"></span><span id="host">확인 중…</span></div>
+
+  <div class="year-block">
+    <div class="year-label">이동할 연도</div>
+    <div class="pixel year-display" id="yearLabel">2001</div>
+    <input type="range" id="year" min="1996" value="2001" class="slider">
     <div class="presets">
-      <button class="btn" data-year="1999">1999</button>
-      <button class="btn" data-year="2005">2005</button>
-      <button class="btn" data-year="2010">2010</button>
-      <button class="btn" data-year="2015">2015</button>
-      <button class="btn" data-year="2020">2020</button>
+      <button class="chip" data-year="1999">1999</button>
+      <button class="chip" data-year="2005">2005</button>
+      <button class="chip" data-year="2010">2010</button>
+      <button class="chip" data-year="2015">2015</button>
+      <button class="chip" data-year="2020">2020</button>
     </div>
-    <label class="check"><input type="checkbox" id="skin" checked> 레트로 스킨 적용</label>
-    <button class="btn primary" id="go">과거로 이동</button>
-    <p class="msg" id="msg"></p>
   </div>
+
+  <label class="skin-row">
+    <span>레트로 스킨<span class="hint">아카이브 페이지에 95풍 스타일 적용</span></span>
+    <input type="checkbox" id="skin" class="switch-input" checked>
+    <span class="switch-track"><span class="knob"></span></span>
+  </label>
+
+  <button class="btn primary cta" id="go">과거로 이동</button>
+  <p class="msg" id="msg"></p>
+  <footer class="pop-foot">Wayback Machine 아카이브 기반</footer>
 </div>
 <script src="popup.js"></script>
 </body>

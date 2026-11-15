@@ -59,9 +59,10 @@ function fmtDate(ts) {
 function showOverlay(kind, err) {
   $('overlay').classList.remove('hidden');
   $('overlayRetry').hidden = kind === 'loading';
+  $('overlaySpinner').style.display = kind === 'loading' ? '' : 'none';
   if (kind === 'loading') {
     $('overlayTitle').textContent = '시간 이동';
-    $('overlayText').innerHTML = '시간 이동 중<span class="blink">_</span><br>아카이브 로딩이 느릴 수 있습니다 (최대 1분).';
+    $('overlayText').textContent = '아카이브에서 스냅샷을 찾는 중… 로딩이 느릴 수 있습니다 (최대 1분).';
   } else if (kind === 'empty') {
     $('overlayTitle').textContent = '스냅샷 없음';
     $('overlayText').textContent = year + '년 스냅샷을 찾을 수 없습니다. 다른 연도를 선택해 보세요.';
@@ -87,12 +88,13 @@ async function load() {
     const ts = snap.row[1];
     const orig = snap.row[2];
     const d = fmtDate(ts);
-    $('titleText').textContent = hostOf(originalUrl) + ' — ' + d.title + ' — 웹 타임머신';
+    $('siteHost').textContent = hostOf(originalUrl);
+    $('snapBadge').textContent = d.full;
     document.title = '웹 타임머신 — ' + hostOf(originalUrl) + ' (' + d.year + ')';
     $('addr').textContent = orig;
     $('status').textContent = snap.exact
-      ? '스냅샷: ' + d.full
-      : '요청한 ' + year + '년 스냅샷이 없어 가장 가까운 ' + d.full + ' 스냅샷을 표시합니다';
+      ? '스냅샷: ' + d.title
+      : '요청한 ' + year + '년 스냅샷이 없어 가장 가까운 ' + d.title + ' 스냅샷을 표시합니다';
     lastSrc = 'https://web.archive.org/web/' + ts + 'if_/' + orig;
     $('frame').src = lastSrc;
   } catch (e) {
@@ -112,12 +114,12 @@ $('yearInput').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') go(parseInt($('yearInput').value, 10) || year);
 });
 $('overlayRetry').addEventListener('click', load);
+$('backToPresent').addEventListener('click', () => { if (originalUrl) location.href = originalUrl; });
 
-function backToPresent() { if (originalUrl) location.href = originalUrl; }
-$('backToPresent').addEventListener('click', backToPresent);
-$('btnPresent').addEventListener('click', backToPresent);
-
-function renderSkin(on) { $('skinToggle').textContent = '레트로 스킨: ' + (on ? 'ON' : 'OFF'); }
+function renderSkin(on) {
+  $('skinToggle').classList.toggle('on', on);
+  $('skinToggle').setAttribute('aria-checked', String(on));
+}
 if (isExt) {
   chrome.storage.local.get({ retroSkin: true }, (v) => renderSkin(v.retroSkin));
   $('skinToggle').addEventListener('click', () =>
@@ -129,7 +131,7 @@ if (isExt) {
     if (area === 'local' && c.retroSkin) renderSkin(c.retroSkin.newValue);
   });
 } else {
-  $('skinToggle').hidden = true;
+  $('skinToggle').closest('.skin-ctl').hidden = true;
 }
 
 $('yearInput').max = MAX_YEAR;
@@ -138,5 +140,6 @@ if (!originalUrl || !/^https?:/i.test(originalUrl)) {
   $('overlayRetry').hidden = true;
   $('status').textContent = '대기';
 } else {
+  $('siteHost').textContent = hostOf(originalUrl);
   load();
 }

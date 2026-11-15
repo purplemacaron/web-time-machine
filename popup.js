@@ -10,7 +10,7 @@ function setYear(y) {
   $('yearLabel').textContent = y;
 }
 yearInput.addEventListener('input', () => setYear(yearInput.value));
-document.querySelectorAll('.presets .btn').forEach((b) =>
+document.querySelectorAll('.presets .chip').forEach((b) =>
   b.addEventListener('click', () => setYear(b.dataset.year)));
 
 chrome.storage.local.get({ retroSkin: true }, (v) => { $('skin').checked = v.retroSkin; });
