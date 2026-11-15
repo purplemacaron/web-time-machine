@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>웹 타임머신</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+  html, body { height: 100%; }
+  #app { display: flex; flex-direction: column; height: 100vh; }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-bottom: 1px solid #808080;
+    box-shadow: 0 1px 0 #dfdfdf;
+  }
+  .toolbar .btn { padding: 3px 8px; }
+  #yearInput { width: 64px; }
+  .sep {
+    width: 1px;
+    align-self: stretch;
+    margin: 2px 4px;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #dfdfdf;
+  }
+  .flex { flex: 1; }
+  .address-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 4px;
+    border-bottom: 1px solid #808080;
+  }
+  .address-bar .field {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #frameWrap { position: relative; flex: 1; background: #fff; }
+  #frame { width: 100%; height: 100%; border: 0; display: block; }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: #c0c0c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #overlay.hidden { display: none; }
+  .dialog {
+    background: #c0c0c0;
+    border: 2px outset #dfdfdf;
+    min-width: 320px;
+    max-width: 480px;
+  }
+  .dialog .body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .dialog p { margin: 0; line-height: 1.5; }
+  .blink { animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title-bar">
+    <span class="title" id="titleText">웹 타임머신</span>
+    <button class="tb" id="btnPresent" title="현재로 복귀">X</button>
+  </div>
+  <div class="toolbar">
+    <button class="btn" id="prevYear" title="1년 전">◀</button>
+    <input class="field" id="yearInput" type="number" min="1996">
+    <button class="btn" id="nextYear" title="1년 후">▶</button>
+    <button class="btn primary" id="goYear">이동</button>
+    <span class="sep"></span>
+    <button class="btn" id="skinToggle">레트로 스킨: ON</button>
+    <span class="flex"></span>
+    <button class="btn" id="backToPresent">현재로 복귀</button>
+  </div>
+  <div class="address-bar"><span>주소</span><span class="field" id="addr"></span></div>
+  <div id="frameWrap">
+    <iframe id="frame" title="아카이브 페이지"></iframe>
+    <div id="overlay">
+      <div class="dialog">
+        <div class="title-bar"><span class="title" id="overlayTitle">시간 이동</span></div>
+        <div class="body">
+          <p id="overlayText">시간 이동 중<span class="blink">_</span></p>
+          <button class="btn" id="overlayRetry" hidden>다시 시도</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <span id="status">준비</span>
+    <span>출처: Wayback Machine (archive.org)</span>
+  </div>
+</div>
+<script src="viewer.js"></script>
+</body>
+</html>

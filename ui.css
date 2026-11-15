@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Tahoma, "MS Sans Serif", Gulim, sans-serif;
+  font-size: 12px;
+  background: #c0c0c0;
+  color: #000;
+}
+.title-bar {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+.title-bar .title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb {
+  width: 18px;
+  height: 16px;
+  padding: 0;
+  background: #c0c0c0;
+  border: 2px outset #dfdfdf;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tb:active { border-style: inset; }
+.btn {
+  background: #c0c0c0;
+  border: 2px outset #dfdfdf;
+  padding: 4px 12px;
+  font: inherit;
+  color: #000;
+  cursor: pointer;
+}
+.btn:active { border-style: inset; }
+.btn:disabled { color: #808080; cursor: default; }
+.btn.primary { font-weight: bold; }
+.field {
+  border: 2px inset #dfdfdf;
+  background: #fff;
+  color: #000;
+  padding: 3px 4px;
+  font: inherit;
+}
+.status-bar {
+  border-top: 1px solid #808080;
+  box-shadow: 0 1px 0 #dfdfdf;
+  padding: 3px 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  background: #c0c0c0;
+}
